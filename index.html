@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Autonomous Search & Rescue Drone</title>
+    <link href="stylesheet.css" rel="stylesheet" />
+  </head>
+  <body>
+    <header>
+      <div><strong>Rescue Drone</strong></div>
+      <nav>
+        <a href="#home">Home</a>
+        <a href="#problem">Problem</a>
+        <a href="#tech">Technologies</a>
+        <a href="#contact">Contact</a>
+      </nav>
+    </header>
+
+    <section class="hero" id="home">
+      <h1>Autonomous Search & Rescue Drone</h1>
+      <p>
+        A UAV combining thermal + RGB vision with AI and GNSS to locate
+        survivors in hazardous environments.
+      </p>
+      <div class="stats">
+        <div class="stat"><strong>450 mm</strong><br />Quadcopter</div>
+        <div class="stat"><strong>MLX90640</strong><br />Thermal Sensor</div>
+        <div class="stat"><strong>ESP32-CAM</strong><br />Vision</div>
+      </div>
+    </section>
+
+    <section id="problem" class="fade">
+      <h2>The Problem</h2>
+      <p>
+        Natural disasters often leave survivors trapped in areas where
+        traditional search efforts are dangerous and slow. Limited visibility
+        due to smoke, dust, or darkness makes detection even harder. Our drone
+        aims to solve this by providing rapid aerial reconnaissance and
+        automated survivor detection.
+      </p>
+    </section>
+
+    <section id="objective" class="fade">
+      <h2>Objective</h2>
+      <p>
+        Deploy an autonomous UAV that integrates thermal imaging, RGB vision,
+        AI-based detection, and geotagging to locate survivors quickly and
+        transmit precise coordinates to rescue teams.
+      </p>
+    </section>
+
+    <section id="tech" class="fade">
+      <h2>Key Technologies</h2>
+      <div class="grid grid-3">
+        <div class="card">
+          MLX90640 Thermal Imaging – Detects heat signatures even in smoke or
+          darkness.
+        </div>
+        <div class="card">
+          ESP32-CAM RGB Vision – Captures visual details for identification.
+        </div>
+        <div class="card">
+          GNSS Geotagging – Provides exact survivor locations on maps.
+        </div>
+        <div class="card">
+          Onboard AI – Runs YOLO/CNN models to detect humans in real time.
+        </div>
+        <div class="card">
+          Obstacle Avoidance – Ensures safe navigation in rough terrains.
+        </div>
+        <div class="card">
+          450 mm Quadcopter – Lightweight, modular design for easy deployment.
+        </div>
+      </div>
+    </section>
+
+    <section id="approach" class="fade">
+      <h2>How It Works</h2>
+      <div class="grid grid-2">
+        <div class="card">
+          <h3>Detection & Fusion</h3>
+          <ul>
+            <li>Thermal and RGB camera streams are synchronized.</li>
+            <li>AI identifies human figures from combined data.</li>
+            <li>Detections are tagged with GPS coordinates.</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>Communication</h3>
+          <ul>
+            <li>Drone transmits alerts and location to rescuers.</li>
+            <li>Mission control receives live data and mapping.</li>
+            <li>Operators can monitor from a safe distance.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section id="impact" class="fade">
+      <h2>Impact & Benefits</h2>
+      <div class="grid grid-2">
+        <ul>
+          <li>Rapid reconnaissance in disaster-hit areas.</li>
+          <li>Enhanced visibility in low-light conditions.</li>
+          <li>Safe access to dangerous or collapsed zones.</li>
+        </ul>
+        <ul>
+          <li>Cost-effective compared to helicopters.</li>
+          <li>Protects human rescuers from risk.</li>
+          <li>Speeds up life-saving operations.</li>
+        </ul>
+      </div>
+    </section>
+
+    <section id="future" class="fade">
+      <h2>Future Enhancements</h2>
+      <div class="grid grid-2">
+        <div class="card">
+          <h3>Swarm Drones</h3>
+          <p>
+            Multiple drones working together for wider area coverage and faster
+            response times.
+          </p>
+        </div>
+        <div class="card">
+          <h3>AI Improvements</h3>
+          <p>
+            More advanced models to differentiate between humans, animals, and
+            debris with higher accuracy.
+          </p>
+        </div>
+        <div class="card">
+          <h3>Extended Flight Time</h3>
+          <p>
+            Integration of solar charging and efficient power systems for longer
+            missions.
+          </p>
+        </div>
+        <div class="card">
+          <h3>Autonomous Rescue Support</h3>
+          <p>
+            Payload delivery (medkits, supplies) directly to detected survivors.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section id="contact" class="fade">
+      <h2>Contact</h2>
+      <form>
+        <input type="text" placeholder="Your name" />
+        <input type="email" placeholder="Email" />
+        <textarea rows="4" placeholder="Message"></textarea>
+        <button type="submit">Send</button>
+      </form>
+    </section>
+
+    <footer>
+      <p>© 2025 Autonomous Rescue Drone Project</p>
+    </footer>
+
+    <script src="javascript.js"></script>
+  </body>
+</html>
