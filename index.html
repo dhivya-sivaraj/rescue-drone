@@ -1,160 +1,53 @@
-#define _WINSOCK_DEPRECATED_NO_WARNINGS
-#include <winsock2.h>
-#include <ws2tcpip.h>
-#include <windows.h>
-#include <iostream>
-#include <sstream>
-#include <fstream>
-#include <string>
-#include <filesystem>
-#include <cctype>
-
-#pragma comment(lib, "Ws2_32.lib")
-
-namespace fs = std::filesystem;
-
-static std::string mime_type(const std::string& path) {
-    auto ext = fs::path(path).extension().string();
-    for (auto& c : ext) c = (char)tolower(c);
-    if (ext == ".html" || ext == ".htm") return "text/html; charset=utf-8";
-    if (ext == ".css") return "text/css; charset=utf-8";
-    if (ext == ".js") return "application/javascript; charset=utf-8";
-    if (ext == ".json") return "application/json; charset=utf-8";
-    if (ext == ".txt") return "text/plain; charset=utf-8";
-    if (ext == ".png") return "image/png";
-    if (ext == ".jpg" || ext == ".jpeg") return "image/jpeg";
-    if (ext == ".svg") return "image/svg+xml";
-    if (ext == ".ico") return "image/x-icon";
-    return "application/octet-stream";
-}
-
-static void send_all(SOCKET s, const char* data, int len) {
-    int sent = 0;
-    while (sent < len) {
-        int n = send(s, data + sent, len - sent, 0);
-        if (n <= 0) break;
-        sent += n;
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Search & Rescue Thermal Drone</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background: #f6f8fa;
+      color: #24292f;
     }
-}
-
-static void send_response(SOCKET s, const std::string& status, const std::string& contentType, const std::string& body) {
-    std::ostringstream oss;
-    oss << "HTTP/1.1 " << status << "\r\n";
-    oss << "Content-Type: " << contentType << "\r\n";
-    oss << "Content-Length: " << body.size() << "\r\n";
-    oss << "Connection: close\r\n";
-    oss << "Access-Control-Allow-Origin: *\r\n";
-    oss << "\r\n";
-    std::string head = oss.str();
-    send_all(s, head.c_str(), (int)head.size());
-    send_all(s, body.c_str(), (int)body.size());
-}
-
-static std::string read_file(const fs::path& p, bool binary=false) {
-    std::ifstream ifs(p, binary ? std::ios::binary : std::ios::in);
-    if (!ifs) return "";
-    std::ostringstream ss;
-    ss << ifs.rdbuf();
-    return ss.str();
-}
-
-static void write_contact_log(const std::string& jsonLine) {
-    fs::create_directories("data");
-    std::ofstream ofs("data/contact_log.jsonl", std::ios::app);
-    ofs << jsonLine << "\n";
-}
-
-int main(int argc, char* argv[]) {
-    const char* host = (argc > 1) ? argv[1] : "127.0.0.1";
-    int port = (argc > 2) ? atoi(argv[2]) : 8080;
-
-    WSADATA wsa;
-    if (WSAStartup(MAKEWORD(2,2), &wsa) != 0) {
-        printf("WSAStartup failed\n");
-        return 1;
+    header {
+      background: #24292f;
+      color: white;
+      padding: 1rem 2rem;
+      text-align: center;
     }
-
-    SOCKET server = socket(AF_INET, SOCK_STREAM, 0);
-    if (server == INVALID_SOCKET) {
-        printf("socket failed\n");
-        WSACleanup();
-        return 1;
+    header h1 {
+      margin: 0;
+      font-size: 2rem;
     }
-
-    sockaddr_in addr{};
-    addr.sin_family = AF_INET;
-    addr.sin_port = htons(port);
-    addr.sin_addr.s_addr = inet_addr(host);
-
-    char enable = 1;
-    setsockopt(server, SOL_SOCKET, SO_REUSEADDR, &enable, sizeof(enable));
-
-    if (bind(server, (sockaddr*)&addr, sizeof(addr)) == SOCKET_ERROR) {
-        printf("bind failed (is port in use?)\n");
-        closesocket(server);
-        WSACleanup();
-        return 1;
+    nav {
+      margin-top: 0.5rem;
     }
-
-    if (listen(server, SOMAXCONN) == SOCKET_ERROR) {
-        printf("listen failed\n");
-        closesocket(server);
-        WSACleanup();
-        return 1;
+    nav a {
+      color: #58a6ff;
+      text-decoration: none;
+      margin: 0 1rem;
     }
-
-    printf("Serving http://%s:%d (public folder: ./public)\n", host, port);
-
-    while (true) {
-        SOCKET client = accept(server, NULL, NULL);
-        if (client == INVALID_SOCKET) continue;
-
-        char buf[8192];
-        int n = recv(client, buf, sizeof(buf), 0);
-        if (n <= 0) {
-            closesocket(client);
-            continue;
-        }
-
-        std::string req(buf, buf + n);
-
-        // Parse request line
-        auto firstLineEnd = req.find("\r\n");
-        std::string requestLine = req.substr(0, firstLineEnd);
-        std::istringstream rl(requestLine);
-        std::string method, path, version;
-        rl >> method >> path >> version;
-        if (path.empty()) path = "/";
-
-        // Handle POST /api/contact
-        if (method == "POST" && path == "/api/contact") {
-            auto pos = req.find("\r\n\r\n");
-            std::string body = (pos != std::string::npos) ? req.substr(pos + 4) : "";
-            write_contact_log(body);
-            send_response(client, "200 OK", "application/json", R"({"ok":true})");
-        } else {
-            // Serve static files
-            if (path == "/") path = "/index.html";
-            fs::path f = fs::path("public") / path.substr(1);
-
-            if (fs::exists(f) && fs::is_regular_file(f)) {
-                // Read binary for images and non-text files
-                bool binary = !(path.ends_with(".html") || path.ends_with(".htm") ||
-                                path.ends_with(".css") || path.ends_with(".js") ||
-                                path.ends_with(".json") || path.ends_with(".txt"));
-
-                std::string content = read_file(f, binary);
-                send_response(client, "200 OK", mime_type(path), content);
-            } else {
-                send_response(client, "404 Not Found", "text/plain", "Not Found");
-            }
-        }
-
-        closesocket(client);
+    main {
+      max-width: 800px;
+      margin: 2rem auto;
+      padding: 1rem;
+      background: white;
+      border: 1px solid #d0d7de;
+      border-radius: 8px;
     }
+    h2 {
+      border-bottom: 1px solid #d0d7de;
+      padding-bottom: 0.5rem;
+    }
+    footer {
+      text-align: center;
+      padding: 1rem;
+      margin-top: 2rem;
+      background: #f0f3f6;
+      font-size:
 
-    closesocket(server);
-    WSACleanup();
-    return 0;
-}
+   
       
