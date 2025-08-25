@@ -1,70 +1,68 @@
 
-   <!doctype html>
-<html lang="en">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Byte Brigade — Search & Rescue Thermal Drone</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
-  <style>
-    :root{
-      --bg:#0f1724; /* deep navy */
-      --card:#0b1220;
-      --accent:#00B894; /* teal */
-      --muted:#98A0B3;
-      --glass: rgba(255,255,255,0.04);
-      --accent-2:#FF6B6B;
-      --max-width:1100px;
-    }
-    *{box-sizing:border-box}
-    html,body{height:100%}
-    body{
-      margin:0;
-      font-family:Inter,system-ui,Segoe UI,Roboto,"Helvetica Neue",Arial;
-      background: linear-gradient(180deg,#071021 0%,#071827 60%);
-      color:#E6EEF6;
-      -webkit-font-smoothing:antialiased;
-      -moz-osx-font-smoothing:grayscale;
-      line-height:1.4;
-      padding:40px 20px;
-      display:flex;justify-content:center;
-    }
-    .wrap{width:100%;max-width:var(--max-width)}
 
-    header{display:flex;align-items:center;justify-content:space-between;margin-bottom:28px}
-    .brand{display:flex;gap:16px;align-items:center}
-    .logo{
-      width:64px;height:64px;border-radius:12px;background:linear-gradient(135deg,var(--accent),#2BC0E4);
-      display:flex;align-items:center;justify-content:center;font-weight:800;color:#042;
-      box-shadow:0 8px 30px rgba(2,10,22,0.6);
-    }
-    .brand h1{margin:0;font-size:18px;letter-spacing:1px}
-    nav a{color:var(--muted);text-decoration:none;margin-left:18px}
-    .hero{display:grid;grid-template-columns:1fr 420px;gap:28px;align-items:start;margin-bottom:36px}
+<!doctype html>
+</div>
+</div>
+</div>
+</section>
 
-    .hero-left{background:linear-gradient(180deg,rgba(255,255,255,0.02),transparent);padding:36px;border-radius:14px;box-shadow:0 6px 30px rgba(2,8,20,0.6)}
-    .kicker{font-weight:700;color:var(--accent);letter-spacing:2px}
-    .title{font-size:38px;margin:12px 0 10px;font-weight:800;line-height:1.02}
-    .sub{color:var(--muted);margin-bottom:18px}
-    .cta-row{display:flex;gap:12px}
-    .btn{background:linear-gradient(90deg,var(--accent),#2BC0E4);border:none;padding:12px 18px;border-radius:10px;color:#021;cursor:pointer;font-weight:700}
-    .ghost{background:transparent;border:1px solid rgba(255,255,255,0.06);padding:12px 18px;border-radius:10px;color:var(--muted);cursor:pointer}
 
-    .hero-right{background:var(--card);border-radius:12px;padding:22px;min-height:260px;display:flex;flex-direction:column;gap:12px}
-    .stat{display:flex;justify-content:space-between;align-items:center}
-    .stat h3{margin:0}
-    .card-list{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:8px}
-    .feature{background:var(--glass);padding:12px;border-radius:10px}
+<section>
+<div class="content">
+<h2>Problem — Why traditional methods fail</h2>
+<p class="sub">Traditional ground-based search operations are frequently slowed down by collapsed structures, inaccessible terrain, and hazardous conditions that put both rescuers and survivors at risk. These limitations lead to significant delays in response time, reducing the chances of saving lives.</p>
+</div>
+</section>
 
-    /* Sections */
-    section{margin-bottom:28px}
-    .content{background:linear-gradient(180deg,rgba(255,255,255,0.02),transparent);padding:22px;border-radius:12px}
-    .grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
-    .card{background:linear-gradient(180deg,#071227,rgba(255,255,255,0.02));padding:18px;border-radius:10px;min-height:140px}
-    .card h4{margin:0 0 8px}
-    .step{display:flex;gap:12px;align-items:flex-start}
-    .step .num{width:46px;height:46px;border-radius:10px;background:linear-gradient(180deg,var(--accent),#2BC0E4);display:flex;align-items:center;justify-content:center;font-weight:800;color:#062}
 
-    footer{display:flex;justify-content:space-between;align-items:center;padding-top:10px;color:var(--muted);font-size:14px}
-    .team{display:flex;gap:14px;flex-wrap:wrap}
-    .member{background:var(--glass);padding:8px 12px;border-radius:
+<section id="team">
+<div class="content">
+<h2>Team Byte Brigade</h2>
+<div class="team">
+<div class="member">SRIDHARSHINI</div>
+<div class="member">TEENA SHIRLEY</div>
+<div class="member">SHYNISHA</div>
+<div class="member">SAISHA</div>
+<div class="member">MOHANA PRIYA</div>
+<div class="member">DHIVYA</div>
+</div>
+</div>
+</section>
+
+
+<section id="contact">
+<div class="content">
+<h2>Contact</h2>
+<p>Projectdrone4321@gmail.com • +91 8428642727</p>
+<form onsubmit="handleSubmit(event)" style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">
+<input required placeholder="Your name" style="flex:1;min-width:200px;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.1);background:transparent;color:inherit" />
+<input required placeholder="Email" type="email" style="flex:1;min-width:200px;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.1);background:transparent;color:inherit" />
+<textarea required placeholder="Message" rows="3" style="width:100%;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.1);background:transparent;color:inherit"></textarea>
+<button class="btn" type="submit">Send</button>
+</form>
+</div>
+</section>
+</main>
+
+
+<footer>
+<div>© <span id="year"></span> BYTE BRIGADE — AI Powered Disaster Response</div>
+<div>Designed to be portable and low-cost (under ₹4000)</div>
+</footer>
+</div>
+
+
+<script>
+document.getElementById('year').textContent = new Date().getFullYear();
+function scrollToId(id){
+const el=document.getElementById(id);
+if(el) el.scrollIntoView({behavior:'smooth'});
+}
+function handleSubmit(e){
+e.preventDefault();
+alert('Thanks — message sent (demo). Replace with a real backend to handle form submissions.');
+e.target.reset();
+}
+</script>
+</body>
+</html>
