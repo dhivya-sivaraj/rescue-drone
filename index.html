@@ -1,18 +1,13 @@
-// server.cpp - Minimal Windows Winsock HTTP server to serve ./public and log POST /api/contact
-// Build: cl /EHsc /std:c++17 server.cpp ws2_32.lib
-// Run:   server.exe 127.0.0.1 8080
-// Then open http://127.0.0.1:8080/ in your browser.
-
 #define _WINSOCK_DEPRECATED_NO_WARNINGS
 #include <winsock2.h>
 #include <ws2tcpip.h>
 #include <windows.h>
-#include <cstdio>
-#include <cstring>
-#include <string>
-#include <fstream>
+#include <iostream>
 #include <sstream>
+#include <fstream>
+#include <string>
 #include <filesystem>
+#include <cctype>
 
 #pragma comment(lib, "Ws2_32.lib")
 
@@ -20,11 +15,12 @@ namespace fs = std::filesystem;
 
 static std::string mime_type(const std::string& path) {
     auto ext = fs::path(path).extension().string();
-    for (auto& c : const_cast<std::string&>(ext)) c = tolower(c);
+    for (auto& c : ext) c = (char)tolower(c);
     if (ext == ".html" || ext == ".htm") return "text/html; charset=utf-8";
     if (ext == ".css") return "text/css; charset=utf-8";
     if (ext == ".js") return "application/javascript; charset=utf-8";
     if (ext == ".json") return "application/json; charset=utf-8";
+    if (ext == ".txt") return "text/plain; charset=utf-8";
     if (ext == ".png") return "image/png";
     if (ext == ".jpg" || ext == ".jpeg") return "image/jpeg";
     if (ext == ".svg") return "image/svg+xml";
@@ -107,7 +103,7 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
-    printf("Serving http://%s:%d  (public folder: ./public)\n", host, port);
+    printf("Serving http://%s:%d (public folder: ./public)\n", host, port);
 
     while (true) {
         SOCKET client = accept(server, NULL, NULL);
@@ -115,10 +111,14 @@ int main(int argc, char* argv[]) {
 
         char buf[8192];
         int n = recv(client, buf, sizeof(buf), 0);
-        if (n <= 0) { closesocket(client); continue; }
+        if (n <= 0) {
+            closesocket(client);
+            continue;
+        }
+
         std::string req(buf, buf + n);
 
-        // Parse first line
+        // Parse request line
         auto firstLineEnd = req.find("\r\n");
         std::string requestLine = req.substr(0, firstLineEnd);
         std::istringstream rl(requestLine);
@@ -126,19 +126,24 @@ int main(int argc, char* argv[]) {
         rl >> method >> path >> version;
         if (path.empty()) path = "/";
 
-        // POST /api/contact
+        // Handle POST /api/contact
         if (method == "POST" && path == "/api/contact") {
             auto pos = req.find("\r\n\r\n");
             std::string body = (pos != std::string::npos) ? req.substr(pos + 4) : "";
             write_contact_log(body);
             send_response(client, "200 OK", "application/json", R"({"ok":true})");
-        }
-        else {
-            // serve static files
+        } else {
+            // Serve static files
             if (path == "/") path = "/index.html";
             fs::path f = fs::path("public") / path.substr(1);
+
             if (fs::exists(f) && fs::is_regular_file(f)) {
-                std::string content = read_file(f, false);
+                // Read binary for images and non-text files
+                bool binary = !(path.ends_with(".html") || path.ends_with(".htm") ||
+                                path.ends_with(".css") || path.ends_with(".js") ||
+                                path.ends_with(".json") || path.ends_with(".txt"));
+
+                std::string content = read_file(f, binary);
                 send_response(client, "200 OK", mime_type(path), content);
             } else {
                 send_response(client, "404 Not Found", "text/plain", "Not Found");
@@ -152,6 +157,4 @@ int main(int argc, char* argv[]) {
     WSACleanup();
     return 0;
 }
-
       
-
