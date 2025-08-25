@@ -1,53 +1,70 @@
-<!DOCTYPE html>
+
+   <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Search & Rescue Thermal Drone</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Byte Brigade — Search & Rescue Thermal Drone</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
   <style>
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      margin: 0;
-      padding: 0;
-      background: #f6f8fa;
-      color: #24292f;
+    :root{
+      --bg:#0f1724; /* deep navy */
+      --card:#0b1220;
+      --accent:#00B894; /* teal */
+      --muted:#98A0B3;
+      --glass: rgba(255,255,255,0.04);
+      --accent-2:#FF6B6B;
+      --max-width:1100px;
     }
-    header {
-      background: #24292f;
-      color: white;
-      padding: 1rem 2rem;
-      text-align: center;
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family:Inter,system-ui,Segoe UI,Roboto,"Helvetica Neue",Arial;
+      background: linear-gradient(180deg,#071021 0%,#071827 60%);
+      color:#E6EEF6;
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+      line-height:1.4;
+      padding:40px 20px;
+      display:flex;justify-content:center;
     }
-    header h1 {
-      margin: 0;
-      font-size: 2rem;
-    }
-    nav {
-      margin-top: 0.5rem;
-    }
-    nav a {
-      color: #58a6ff;
-      text-decoration: none;
-      margin: 0 1rem;
-    }
-    main {
-      max-width: 800px;
-      margin: 2rem auto;
-      padding: 1rem;
-      background: white;
-      border: 1px solid #d0d7de;
-      border-radius: 8px;
-    }
-    h2 {
-      border-bottom: 1px solid #d0d7de;
-      padding-bottom: 0.5rem;
-    }
-    footer {
-      text-align: center;
-      padding: 1rem;
-      margin-top: 2rem;
-      background: #f0f3f6;
-      font-size:
+    .wrap{width:100%;max-width:var(--max-width)}
 
-   
-      
+    header{display:flex;align-items:center;justify-content:space-between;margin-bottom:28px}
+    .brand{display:flex;gap:16px;align-items:center}
+    .logo{
+      width:64px;height:64px;border-radius:12px;background:linear-gradient(135deg,var(--accent),#2BC0E4);
+      display:flex;align-items:center;justify-content:center;font-weight:800;color:#042;
+      box-shadow:0 8px 30px rgba(2,10,22,0.6);
+    }
+    .brand h1{margin:0;font-size:18px;letter-spacing:1px}
+    nav a{color:var(--muted);text-decoration:none;margin-left:18px}
+    .hero{display:grid;grid-template-columns:1fr 420px;gap:28px;align-items:start;margin-bottom:36px}
+
+    .hero-left{background:linear-gradient(180deg,rgba(255,255,255,0.02),transparent);padding:36px;border-radius:14px;box-shadow:0 6px 30px rgba(2,8,20,0.6)}
+    .kicker{font-weight:700;color:var(--accent);letter-spacing:2px}
+    .title{font-size:38px;margin:12px 0 10px;font-weight:800;line-height:1.02}
+    .sub{color:var(--muted);margin-bottom:18px}
+    .cta-row{display:flex;gap:12px}
+    .btn{background:linear-gradient(90deg,var(--accent),#2BC0E4);border:none;padding:12px 18px;border-radius:10px;color:#021;cursor:pointer;font-weight:700}
+    .ghost{background:transparent;border:1px solid rgba(255,255,255,0.06);padding:12px 18px;border-radius:10px;color:var(--muted);cursor:pointer}
+
+    .hero-right{background:var(--card);border-radius:12px;padding:22px;min-height:260px;display:flex;flex-direction:column;gap:12px}
+    .stat{display:flex;justify-content:space-between;align-items:center}
+    .stat h3{margin:0}
+    .card-list{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:8px}
+    .feature{background:var(--glass);padding:12px;border-radius:10px}
+
+    /* Sections */
+    section{margin-bottom:28px}
+    .content{background:linear-gradient(180deg,rgba(255,255,255,0.02),transparent);padding:22px;border-radius:12px}
+    .grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+    .card{background:linear-gradient(180deg,#071227,rgba(255,255,255,0.02));padding:18px;border-radius:10px;min-height:140px}
+    .card h4{margin:0 0 8px}
+    .step{display:flex;gap:12px;align-items:flex-start}
+    .step .num{width:46px;height:46px;border-radius:10px;background:linear-gradient(180deg,var(--accent),#2BC0E4);display:flex;align-items:center;justify-content:center;font-weight:800;color:#062}
+
+    footer{display:flex;justify-content:space-between;align-items:center;padding-top:10px;color:var(--muted);font-size:14px}
+    .team{display:flex;gap:14px;flex-wrap:wrap}
+    .member{background:var(--glass);padding:8px 12px;border-radius:
