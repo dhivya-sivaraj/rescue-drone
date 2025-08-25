@@ -1,165 +1,157 @@
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Autonomous Search & Rescue Drone</title>
-    <link href="stylesheet.css" rel="stylesheet" />
-  </head>
-  <body>
-    <header>
-      <div><strong>Rescue Drone</strong></div>
-      <nav>
-        <a href="#home">Home</a>
-        <a href="#problem">Problem</a>
-        <a href="#tech">Technologies</a>
-        <a href="#contact">Contact</a>
-      </nav>
-    </header>
+// server.cpp - Minimal Windows Winsock HTTP server to serve ./public and log POST /api/contact
+// Build: cl /EHsc /std:c++17 server.cpp ws2_32.lib
+// Run:   server.exe 127.0.0.1 8080
+// Then open http://127.0.0.1:8080/ in your browser.
 
-    <section class="hero" id="home">
-      <h1>Autonomous Search & Rescue Drone</h1>
-      <p>
-        A UAV combining thermal + RGB vision with AI and GNSS to locate
-        survivors in hazardous environments.
-      </p>
-      <div class="stats">
-        <div class="stat"><strong>450 mm</strong><br />Quadcopter</div>
-        <div class="stat"><strong>MLX90640</strong><br />Thermal Sensor</div>
-        <div class="stat"><strong>ESP32-CAM</strong><br />Vision</div>
-      </div>
-    </section>
+#define _WINSOCK_DEPRECATED_NO_WARNINGS
+#include <winsock2.h>
+#include <ws2tcpip.h>
+#include <windows.h>
+#include <cstdio>
+#include <cstring>
+#include <string>
+#include <fstream>
+#include <sstream>
+#include <filesystem>
 
-    <section id="problem" class="fade">
-      <h2>The Problem</h2>
-      <p>
-        Natural disasters often leave survivors trapped in areas where
-        traditional search efforts are dangerous and slow. Limited visibility
-        due to smoke, dust, or darkness makes detection even harder. Our drone
-        aims to solve this by providing rapid aerial reconnaissance and
-        automated survivor detection.
-      </p>
-    </section>
+#pragma comment(lib, "Ws2_32.lib")
 
-    <section id="objective" class="fade">
-      <h2>Objective</h2>
-      <p>
-        Deploy an autonomous UAV that integrates thermal imaging, RGB vision,
-        AI-based detection, and geotagging to locate survivors quickly and
-        transmit precise coordinates to rescue teams.
-      </p>
-    </section>
+namespace fs = std::filesystem;
 
-    <section id="tech" class="fade">
-      <h2>Key Technologies</h2>
-      <div class="grid grid-3">
-        <div class="card">
-          MLX90640 Thermal Imaging – Detects heat signatures even in smoke or
-          darkness.
-        </div>
-        <div class="card">
-          ESP32-CAM RGB Vision – Captures visual details for identification.
-        </div>
-        <div class="card">
-          GNSS Geotagging – Provides exact survivor locations on maps.
-        </div>
-        <div class="card">
-          Onboard AI – Runs YOLO/CNN models to detect humans in real time.
-        </div>
-        <div class="card">
-          Obstacle Avoidance – Ensures safe navigation in rough terrains.
-        </div>
-        <div class="card">
-          450 mm Quadcopter – Lightweight, modular design for easy deployment.
-        </div>
-      </div>
-    </section>
+static std::string mime_type(const std::string& path) {
+    auto ext = fs::path(path).extension().string();
+    for (auto& c : const_cast<std::string&>(ext)) c = tolower(c);
+    if (ext == ".html" || ext == ".htm") return "text/html; charset=utf-8";
+    if (ext == ".css") return "text/css; charset=utf-8";
+    if (ext == ".js") return "application/javascript; charset=utf-8";
+    if (ext == ".json") return "application/json; charset=utf-8";
+    if (ext == ".png") return "image/png";
+    if (ext == ".jpg" || ext == ".jpeg") return "image/jpeg";
+    if (ext == ".svg") return "image/svg+xml";
+    if (ext == ".ico") return "image/x-icon";
+    return "application/octet-stream";
+}
 
-    <section id="approach" class="fade">
-      <h2>How It Works</h2>
-      <div class="grid grid-2">
-        <div class="card">
-          <h3>Detection & Fusion</h3>
-          <ul>
-            <li>Thermal and RGB camera streams are synchronized.</li>
-            <li>AI identifies human figures from combined data.</li>
-            <li>Detections are tagged with GPS coordinates.</li>
-          </ul>
-        </div>
-        <div class="card">
-          <h3>Communication</h3>
-          <ul>
-            <li>Drone transmits alerts and location to rescuers.</li>
-            <li>Mission control receives live data and mapping.</li>
-            <li>Operators can monitor from a safe distance.</li>
-          </ul>
-        </div>
-      </div>
-    </section>
+static void send_all(SOCKET s, const char* data, int len) {
+    int sent = 0;
+    while (sent < len) {
+        int n = send(s, data + sent, len - sent, 0);
+        if (n <= 0) break;
+        sent += n;
+    }
+}
 
-    <section id="impact" class="fade">
-      <h2>Impact & Benefits</h2>
-      <div class="grid grid-2">
-        <ul>
-          <li>Rapid reconnaissance in disaster-hit areas.</li>
-          <li>Enhanced visibility in low-light conditions.</li>
-          <li>Safe access to dangerous or collapsed zones.</li>
-        </ul>
-        <ul>
-          <li>Cost-effective compared to helicopters.</li>
-          <li>Protects human rescuers from risk.</li>
-          <li>Speeds up life-saving operations.</li>
-        </ul>
-      </div>
-    </section>
+static void send_response(SOCKET s, const std::string& status, const std::string& contentType, const std::string& body) {
+    std::ostringstream oss;
+    oss << "HTTP/1.1 " << status << "\r\n";
+    oss << "Content-Type: " << contentType << "\r\n";
+    oss << "Content-Length: " << body.size() << "\r\n";
+    oss << "Connection: close\r\n";
+    oss << "Access-Control-Allow-Origin: *\r\n";
+    oss << "\r\n";
+    std::string head = oss.str();
+    send_all(s, head.c_str(), (int)head.size());
+    send_all(s, body.c_str(), (int)body.size());
+}
 
-    <section id="future" class="fade">
-      <h2>Future Enhancements</h2>
-      <div class="grid grid-2">
-        <div class="card">
-          <h3>Swarm Drones</h3>
-          <p>
-            Multiple drones working together for wider area coverage and faster
-            response times.
-          </p>
-        </div>
-        <div class="card">
-          <h3>AI Improvements</h3>
-          <p>
-            More advanced models to differentiate between humans, animals, and
-            debris with higher accuracy.
-          </p>
-        </div>
-        <div class="card">
-          <h3>Extended Flight Time</h3>
-          <p>
-            Integration of solar charging and efficient power systems for longer
-            missions.
-          </p>
-        </div>
-        <div class="card">
-          <h3>Autonomous Rescue Support</h3>
-          <p>
-            Payload delivery (medkits, supplies) directly to detected survivors.
-          </p>
-        </div>
-      </div>
-    </section>
+static std::string read_file(const fs::path& p, bool binary=false) {
+    std::ifstream ifs(p, binary ? std::ios::binary : std::ios::in);
+    if (!ifs) return "";
+    std::ostringstream ss;
+    ss << ifs.rdbuf();
+    return ss.str();
+}
 
-    <section id="contact" class="fade">
-      <h2>Contact</h2>
-      <form>
-        <input type="text" placeholder="Your name" />
-        <input type="email" placeholder="Email" />
-        <textarea rows="4" placeholder="Message"></textarea>
-        <button type="submit">Send</button>
-      </form>
-    </section>
+static void write_contact_log(const std::string& jsonLine) {
+    fs::create_directories("data");
+    std::ofstream ofs("data/contact_log.jsonl", std::ios::app);
+    ofs << jsonLine << "\n";
+}
 
-    <footer>
-      <p>© 2025 Autonomous Rescue Drone Project</p>
-    </footer>
+int main(int argc, char* argv[]) {
+    const char* host = (argc > 1) ? argv[1] : "127.0.0.1";
+    int port = (argc > 2) ? atoi(argv[2]) : 8080;
 
-    <script src="javascript.js"></script>
-  </body>
-</html>
+    WSADATA wsa;
+    if (WSAStartup(MAKEWORD(2,2), &wsa) != 0) {
+        printf("WSAStartup failed\n");
+        return 1;
+    }
+
+    SOCKET server = socket(AF_INET, SOCK_STREAM, 0);
+    if (server == INVALID_SOCKET) {
+        printf("socket failed\n");
+        WSACleanup();
+        return 1;
+    }
+
+    sockaddr_in addr{};
+    addr.sin_family = AF_INET;
+    addr.sin_port = htons(port);
+    addr.sin_addr.s_addr = inet_addr(host);
+
+    char enable = 1;
+    setsockopt(server, SOL_SOCKET, SO_REUSEADDR, &enable, sizeof(enable));
+
+    if (bind(server, (sockaddr*)&addr, sizeof(addr)) == SOCKET_ERROR) {
+        printf("bind failed (is port in use?)\n");
+        closesocket(server);
+        WSACleanup();
+        return 1;
+    }
+
+    if (listen(server, SOMAXCONN) == SOCKET_ERROR) {
+        printf("listen failed\n");
+        closesocket(server);
+        WSACleanup();
+        return 1;
+    }
+
+    printf("Serving http://%s:%d  (public folder: ./public)\n", host, port);
+
+    while (true) {
+        SOCKET client = accept(server, NULL, NULL);
+        if (client == INVALID_SOCKET) continue;
+
+        char buf[8192];
+        int n = recv(client, buf, sizeof(buf), 0);
+        if (n <= 0) { closesocket(client); continue; }
+        std::string req(buf, buf + n);
+
+        // Parse first line
+        auto firstLineEnd = req.find("\r\n");
+        std::string requestLine = req.substr(0, firstLineEnd);
+        std::istringstream rl(requestLine);
+        std::string method, path, version;
+        rl >> method >> path >> version;
+        if (path.empty()) path = "/";
+
+        // POST /api/contact
+        if (method == "POST" && path == "/api/contact") {
+            auto pos = req.find("\r\n\r\n");
+            std::string body = (pos != std::string::npos) ? req.substr(pos + 4) : "";
+            write_contact_log(body);
+            send_response(client, "200 OK", "application/json", R"({"ok":true})");
+        }
+        else {
+            // serve static files
+            if (path == "/") path = "/index.html";
+            fs::path f = fs::path("public") / path.substr(1);
+            if (fs::exists(f) && fs::is_regular_file(f)) {
+                std::string content = read_file(f, false);
+                send_response(client, "200 OK", mime_type(path), content);
+            } else {
+                send_response(client, "404 Not Found", "text/plain", "Not Found");
+            }
+        }
+
+        closesocket(client);
+    }
+
+    closesocket(server);
+    WSACleanup();
+    return 0;
+}
+
+      
+
